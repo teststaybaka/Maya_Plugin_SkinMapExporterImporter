@@ -51,6 +51,12 @@ class exportCommand(OpenMayaMPx.MPxCommand):
         if related_cluster == '':
             print 'Please bind skin for this polygon.'
             return;
+
+        paths = cmds.fileDialog2(dialogStyle=2, fileMode = 3, okCaption = "Save", cancelCaption = "Cancel")
+        if not paths:
+            return;
+
+        path = paths[0]
         joints = cmds.skinPercent(related_cluster, polygon+'.vtx[0]', q = True, t = None);
         imgs = []
         for i in range(0, len(joints)):
@@ -89,10 +95,11 @@ class exportCommand(OpenMayaMPx.MPxCommand):
                     # print data[101*width + 200]
 
         for i in range(0, len(joints)):
-            imgs[i].save(joints[i]+'.png')
+            imgs[i].save(path+'/'+joints[i]+'.png')
         
         if warning:
             print 'Warning: Some of uv points are too close. Please adjust UV Map or change output size.'
+        print 'Export Complete.'
 
 # Command
 class importCommand(OpenMayaMPx.MPxCommand):
@@ -118,15 +125,20 @@ class importCommand(OpenMayaMPx.MPxCommand):
             print 'Please bind skin for this polygon.'
             return;
 
+        paths = cmds.fileDialog2(dialogStyle=2, fileMode = 3, okCaption = "Load", cancelCaption = "Cancel")
+        if not paths:
+            return;
+
+        path = paths[0]
         joints = cmds.skinPercent(related_cluster, polygon+'.vtx[0]', q = True, t = None);
         imgs = []
         for i in range(0, len(joints)):
-            if not os.path.isfile(joints[i]+'.png'):
+            if not os.path.isfile(path+'/'+joints[i]+'.png'):
                 imgs.append(0)
                 continue
 
             print joints[i]+'.png'
-            im = Image.open(joints[i]+'.png')
+            im = Image.open(path+'/'+joints[i]+'.png')
             imgs.append(im)
 
         vertices = cmds.getAttr(polygon+'.vrts', multiIndices = True);
@@ -152,7 +164,7 @@ class importCommand(OpenMayaMPx.MPxCommand):
                     else:
                         transformValue.append((joints[z], data[y*width+x][2]/255.0))
                         sum_value += data[y*width+x][2]/255.0
-                        print data[y*width+x][2]/255.0
+                        # print data[y*width+x][2]/255.0
 
                 if abs(sum_value) < 0.001:
                     break
@@ -162,6 +174,7 @@ class importCommand(OpenMayaMPx.MPxCommand):
                 cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[i])+']', transformValue=transformValue)
                 cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[i])+']', normalize=True )
                 break
+        print 'Import Complete.'
 
 
         
