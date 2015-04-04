@@ -101,14 +101,12 @@ class importCommand(OpenMayaMPx.MPxCommand):
                     dist = math.sqrt((pos[0]-ver[0])*(pos[0]-ver[0]) + (pos[1]-ver[1])*(pos[1]-ver[1]) + (pos[2]-ver[2])*(pos[2]-ver[2]))
                     if dist < 0.0001:
                         index = i
-                        break
 
-                if index != -1:
-                    transformValue = []
-                    for i in range(1, len(weights), 2):
-                        transformValue.append((weights[i], float(weights[i+1]) ))
-                    cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[index])+']', transformValue=transformValue)
-                    cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[index])+']', normalize=True)
+                        transformValue = []
+                        for j in range(1, len(weights), 2):
+                            transformValue.append((weights[j], float(weights[j+1]) ))
+                        cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[index])+']', transformValue=transformValue)
+                        cmds.skinPercent(related_cluster, polygon+'.vtx['+str(vertices[index])+']', normalize=True)
 
             f.close()
         print 'Import Complete.'
